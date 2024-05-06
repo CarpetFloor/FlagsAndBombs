@@ -4,3 +4,7 @@ Bomb 2:
 https://www.flaticon.com/free-icon/bomb_13864414?term=bomb&page=1&position=8&origin=search&related_id=13864414
 Bomb 3:
 https://www.flaticon.com/free-icon/bomb_10283581?term=bomb&page=1&position=12&origin=search&related_id=10283581
+Flag 1:
+https://www.flaticon.com/free-icon/finish_2164609?term=flag&page=1&position=9&origin=search&related_id=2164609
+Flag 2:
+https://www.flaticon.com/free-icon/red-flag_2814368?term=flag&page=1&position=13&origin=search&related_id=2814368

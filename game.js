@@ -134,7 +134,7 @@ function clickTile(tileElem) {
     let row = parseInt(split[0]);
     let col = parseInt(split[1]);
     
-    console.log("click at:", row, col);
+    // console.log("click at:", row, col);
 
     // ensure firest tile clicked is not a bomb
     if(bombCount == 0) {
@@ -166,30 +166,33 @@ function clickTile(tileElem) {
 
     // reveal tile
     
-    // bomb
-    if(game[row][col] == 0) {
-        let imgElem = document.createElement("img");
-        imgElem.src = "Assets/bomb_1.png";
-        
-        tileElem.appendChild(imgElem);
-    }
-    else {
-        // calling this function also reveals all other non-number tiles
-        let count = getAdjacentBombs(row, col);
-        if(count == -1) {
-            tileElem.style.backgroundColor = bg;
-
-            // recursively reveal adjacent non-number tiles
-            alreadyChecked = [];
-            revealAdjacents(row, col);
+    // don't allow clicking if there is a flag
+    if(!(flagAt(row, col))) {
+        // bomb
+        if(game[row][col] == 0) {
+            let imgElem = document.createElement("img");
+            imgElem.src = "Assets/bomb_1.png";
+            
+            tileElem.appendChild(imgElem);
+            imgElem.setAttribute("draggable", false);
         }
         else {
-            tileElem.innerText = count;
+            // calling this function also reveals all other non-number tiles
+            let count = getAdjacentBombs(row, col);
+            if(count == -1) {
+                tileElem.style.backgroundColor = bg;
+
+                // recursively reveal adjacent non-number tiles
+                revealAdjacents(row, col);
+            }
+            else {
+                tileElem.innerText = count;
+            }
         }
     }
 }
 
-let alreadyChecked = [];
+let revealed = [];
 const offsets = new Map();
 offsets.set("up", [-1, 0]);
 offsets.set("down", [1, 0]);
@@ -223,10 +226,10 @@ function revealAdjacents(row, col) {
         // console.log(rcheck, ccheck);
     
         if(
-        !(alreadyCheckedHas(rcheck, ccheck)) && 
+        !(revealedHas(rcheck, ccheck)) && 
         (getAdjacentBombs(rcheck, ccheck) == -1)) {
             getTileElem(rcheck, ccheck).style.backgroundColor = bg;
-            alreadyChecked.push([rcheck, ccheck]);
+            revealed.push([rcheck, ccheck]);
     
             revealAdjacents(rcheck, ccheck);
         }
@@ -236,14 +239,24 @@ function revealAdjacents(row, col) {
     }
 }
 
-function alreadyCheckedHas(row, col) {
-    for(let i = 0; i < alreadyChecked.length; i++) {
-        if(alreadyChecked[i][0] == row && alreadyChecked[i][1] == col) {
+function revealedHas(row, col) {
+    for(let i = 0; i < revealed.length; i++) {
+        if(revealed[i][0] == row && revealed[i][1] == col) {
             return true;
         }
     }
 
     return false;
+}
+
+function removeFlagAt(row, col) {
+    for(let i = 0; i < flags.length; i++) {
+        if(flags[i][0] == row && flags[i][1] == col) {
+            flags.splice(i, 1);
+            
+            break;
+        }
+    }
 }
 
 let flags = [];
@@ -265,8 +278,27 @@ function flagTile(e, tileElem) {
     let col = parseInt(split[1]);
 
     console.log("flag at:", row, col);
+    
+    // only allow placing a flag on a non-number tile and a non-revealed tile
+    let valid = (tileElem.innerHTML.length == 0) || ((tileElem.innerHTML.length != 0) && flagAt(row, col));
+    let alreadyRevealed = revealedHas(row, col);
+    
+    if(valid && !(alreadyRevealed)) {
+        if(flagAt(row, col)) {
+            removeFlagAt(row, col);
 
-    if(flagAt())
+            tileElem.innerHTML = "";
+        }
+        else {
+            flags.push([row, col]);
+
+            let imgElem = document.createElement("img");
+            imgElem.src = "Assets/flag_1.png";
+            imgElem.setAttribute("draggable", false);
+
+            tileElem.appendChild(imgElem);
+        }
+    }
 }
 
 function getTileElem(row, col) {
