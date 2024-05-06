@@ -245,41 +245,48 @@ offsets.set("right", [0, 1]);
 function revealAdjacents(row, col) {
     let tocheck = [];
     
+    let rowChecks = [0];
     if(row > 0) {
-        tocheck.push("up");
+        rowChecks.push(-1);
     }
     if(row < rows - 1) {
-        tocheck.push("down");
+        rowChecks.push(1);
     }
 
+    let colChecks = [0];
     if(col > 0) {
-        tocheck.push("left");
+        colChecks.push(-1);
     }
     if(col < cols - 1) {
-        tocheck.push("right");
+        colChecks.push(1);
     }
 
-    for(let c of tocheck) {
-        let rcheck = row + offsets.get(c)[0];
-        let ccheck = col + offsets.get(c)[1];
-    
-        if(
-        !(revealedHas(rcheck, ccheck)) && 
-        (getAdjacentBombs(rcheck, ccheck) == -1)) {
-            let tileElem = getTileElem(rcheck, ccheck);
-            tileElem.style.backgroundColor = bg;
+    for(let r = 0; r < rowChecks.length; r++) {
+        for(let c = 0; c < colChecks.length; c++) {
+            let rcheck = row + rowChecks[r];
+            let ccheck = col + colChecks[c];
 
-            // remove flag if there is one
-            if(flagAt(rcheck, ccheck)) {
-                tileElem.innerHTML = "";
+            diagonal = (rowChecks[r] != 0 && colChecks[c] != 0);
+        
+            if(
+            !(diagonal) && 
+            !(revealedHas(rcheck, ccheck)) && 
+            (getAdjacentBombs(rcheck, ccheck) == -1)) {
+                let tileElem = getTileElem(rcheck, ccheck);
+                tileElem.style.backgroundColor = bg;
+
+                // remove flag if there is one
+                if(flagAt(rcheck, ccheck)) {
+                    tileElem.innerHTML = "";
+                }
+
+                revealed.push([rcheck, ccheck]);
+        
+                revealAdjacents(rcheck, ccheck);
             }
-
-            revealed.push([rcheck, ccheck]);
-    
-            revealAdjacents(rcheck, ccheck);
-        }
-        else if(getAdjacentBombs(rcheck, ccheck) != -1) {
-            getTileElem(rcheck, ccheck).innerText = getAdjacentBombs(rcheck, ccheck);
+            else if(getAdjacentBombs(rcheck, ccheck) != -1) {
+                getTileElem(rcheck, ccheck).innerText = getAdjacentBombs(rcheck, ccheck);
+            }
         }
     }
 }
