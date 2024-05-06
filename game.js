@@ -63,14 +63,15 @@ function hoverTile(tileElem) {
 
     // console.log(row, col, revealedHas(row, col));
 
-    if(!(revealedHas(row, col))) {
+    let valid = (tileElem.innerHTML.length == 0);
+
+    if(valid && !(revealedHas(row, col))) {
         tileElem.style.cursor = "pointer";
         tileElem.style.backgroundColor = highlightColor;
     }
     else {
         tileElem.style.cursor = "auto";
     }
-
 }
 
 function unHoverTile(tileElem) {
@@ -231,6 +232,8 @@ function clickTile(tileElem) {
             gameOver();
         }
         else {
+            // flag
+
             // calling this function also reveals all other non-number tiles
             let count = getAdjacentBombs(row, col);
             if(count == -1) {
@@ -241,8 +244,13 @@ function clickTile(tileElem) {
                 revealed.push([row, col]);
                 revealAdjacents(row, col);
             }
+            // number
             else {
                 tileElem.innerText = count;
+
+                // remove hover effect
+                tileElem.style.backgroundColor = tileColor;
+                tileElem.style.cursor = "auto";
             }
         }
     }
@@ -348,19 +356,25 @@ function flagTile(e, tileElem) {
     let alreadyRevealed = revealedHas(row, col);
     
     if(valid && !(alreadyRevealed)) {
+        // remove flag
         if(flagAt(row, col)) {
             removeFlagAt(row, col);
 
             tileElem.innerHTML = "";
         }
+        // place flag
         else {
             flags.push([row, col]);
-
+            
             let imgElem = document.createElement("img");
             imgElem.src = "Assets/flag_1.png";
             imgElem.setAttribute("draggable", false);
-
+            
             tileElem.appendChild(imgElem);
+
+            // remove hover effect when placing flag
+            tileElem.style.backgroundColor = tileColor;
+            tileElem.style.cursor = "auto";
         }
     }
 }
