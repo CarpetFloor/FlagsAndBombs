@@ -4,9 +4,9 @@ const bg = "#203555";
 let tableElem = document.querySelector("table");
 
 const cols = 10;
-const rows = 10;
+const rows = cols;
 const tileSize = 50;
-const totalBombs = 8;
+const totalBombs = Math.floor(cols * 1.5);
 const bombChance = Math.round(((cols * rows) / totalBombs) * 2);
 let bombCount = 0;
 
@@ -43,7 +43,6 @@ function fillBombs() {
     let i = 0;
     let iteration = 0;
     
-    // fill bombs
     while(bombCount < totalBombs) {
         // console.log("ITERATION", iteration);
 
@@ -61,21 +60,11 @@ function fillBombs() {
                         if(iteration == 0) {
                             ++bombCount;
                             rowData.push(0);
-                            
-                            let imgElem = document.createElement("img");
-                            imgElem.src = "Assets/bomb_1.png";
-                            
-                            tileElem.appendChild(imgElem);
                             // console.log(i + ": placed bomb " + bombCount + " at " + tileElem.id);
                         }
                         else if(game[row][col] != 0) {
                             ++bombCount;
                             game[row][col] = 0;
-                            
-                            let imgElem = document.createElement("img");
-                            imgElem.src = "Assets/bomb_1.png";
-                            
-                            tileElem.appendChild(imgElem);
                             // console.log(i + ": placed bomb " + bombCount + " at " + tileElem.id);
                         }
                         /*
@@ -104,48 +93,30 @@ function fillBombs() {
 
         ++iteration;
     }
-
-    // generate numbers
-    for(let row = 0; row < rows; row++) {
-        for(let col = 0; col < cols; col++) {
-            if(game[row][col] != 0) {
-                getTileElem(row, col).innerText = getAdjacentBombs(row, col);
-            }
-        }
-    }
 }
 
 function getAdjacentBombs(row, col) {
     let count = 0;
 
     let rowChecks = [0];
-    if(row != 0) {
+    if(row > 0) {
         rowChecks.push(-1);
     }
-    if(row != rows - 1) {
+    if(row < rows - 1) {
         rowChecks.push(1);
     }
 
     let colChecks = [0];
-    if(col != 0) {
+    if(col > 0) {
         colChecks.push(-1);
     }
-    if(col != col - 1) {
+    if(col < cols - 1) {
         colChecks.push(1);
     }
 
     for(let r = 0; r < rowChecks.length; r++) {
         for(let c = 0; c < colChecks.length; c++) {
             if(!(rowChecks[r] == 0 && colChecks[c] == 0)) {
-                if(debug) {
-                    console.log(
-                        "CHECKING " + 
-                        (row + rowChecks[r]) + "," + (col + colChecks[c]) + 
-                        "(" + rowChecks[r] + "," + colChecks[c] + ") : " + 
-                        game[row + rowChecks[r]][col + colChecks[c]] + " " + 
-                        (game[row + rowChecks[r]][col + colChecks[c]] == 0)
-                    );
-                }
                 if(game[row + rowChecks[r]][col + colChecks[c]] == 0) {
                     ++count;
                 }
@@ -156,34 +127,146 @@ function getAdjacentBombs(row, col) {
     return (count == 0) ? -1 : count;
 }
 
-console.log(game);
+let startRow = -1;
+let startCol = -1;
+function clickTile(tileElem) {
+    let split = tileElem.id.split(",");
+    let row = parseInt(split[0]);
+    let col = parseInt(split[1]);
+    
+    console.log("click at:", row, col);
 
-if(debug) {
-    for(let r = 0; r < rows; r++) {
-        for(let c = 0; c < cols; c++) {
-            getTileElem(r, c).innerHTML += "<span style='font-size: 11px; color: grey;'>(" + r + ", " + c + ")</span>";
+    // ensure firest tile clicked is not a bomb
+    if(bombCount == 0) {
+        startRow = row;
+        startCol = col;
+        
+        fillBombs();
+
+        // console.log("GAME");
+        // console.log(game);
+        // console.log("_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_");
+ 
+        debug = false;
+        if(debug) {
+            for(let r = 0; r < rows; r++) {
+                for(let c = 0; c < cols; c++) {
+                    let color = "grey";
+                    if(game[r][c] == 0) {
+                        color = "red";
+                    }
+                    getTileElem(r, c).innerHTML += 
+                    "<span style='font-size: 11px; color: " + color + ";'>" + 
+                    getAdjacentBombs(r, c) + 
+                    " (" + r + ", " + c + ")</span>";
+                }
+            }
+        }
+    }
+
+    // reveal tile
+    
+    // bomb
+    if(game[row][col] == 0) {
+        let imgElem = document.createElement("img");
+        imgElem.src = "Assets/bomb_1.png";
+        
+        tileElem.appendChild(imgElem);
+    }
+    else {
+        // calling this function also reveals all other non-number tiles
+        let count = getAdjacentBombs(row, col);
+        if(count == -1) {
+            tileElem.style.backgroundColor = bg;
+
+            // recursively reveal adjacent non-number tiles
+            alreadyChecked = [];
+            revealAdjacents(row, col);
+        }
+        else {
+            tileElem.innerText = count;
         }
     }
 }
 
-let startRow = -1;
-let startCol = -1;
-function clickTile(tileElem) {
-    console.log("click at:", tileElem.id);
-
-    // ensure firest tile clicked is not a bomb
-    if(bombCount == 0) {
-        let split = tileElem.id.split(",");
-        startRow = parseInt(split[0]);
-        startCol = parseInt(split[1]);
-        
-        fillBombs();
+let alreadyChecked = [];
+const offsets = new Map();
+offsets.set("up", [-1, 0]);
+offsets.set("down", [1, 0]);
+offsets.set("left", [0, -1]);
+offsets.set("right", [0, 1]);
+// recursively reveal adjacent non-number tiles
+function revealAdjacents(row, col) {
+    let tocheck = [];
+    
+    if(row > 0) {
+        tocheck.push("up");
     }
+    if(row < rows - 1) {
+        tocheck.push("down");
+    }
+
+    if(col > 0) {
+        tocheck.push("left");
+    }
+    if(col < cols - 1) {
+        tocheck.push("right");
+    }
+    
+    // console.log("--", row, col, "--");
+    // console.log(tocheck);
+
+    for(let c of tocheck) {
+        let rcheck = row + offsets.get(c)[0];
+        let ccheck = col + offsets.get(c)[1];
+
+        // console.log(rcheck, ccheck);
+    
+        if(
+        !(alreadyCheckedHas(rcheck, ccheck)) && 
+        (getAdjacentBombs(rcheck, ccheck) == -1)) {
+            getTileElem(rcheck, ccheck).style.backgroundColor = bg;
+            alreadyChecked.push([rcheck, ccheck]);
+    
+            revealAdjacents(rcheck, ccheck);
+        }
+        else if(getAdjacentBombs(rcheck, ccheck) != -1) {
+            getTileElem(rcheck, ccheck).innerText = getAdjacentBombs(rcheck, ccheck);
+        }
+    }
+}
+
+function alreadyCheckedHas(row, col) {
+    for(let i = 0; i < alreadyChecked.length; i++) {
+        if(alreadyChecked[i][0] == row && alreadyChecked[i][1] == col) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+let flags = [];
+function flagAt(row, col) {
+    for(let i = 0; i < flags.length; i++) {
+        if(flags[i][0] == row && flags[i][1] == col) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 function flagTile(e, tileElem) {
     e.preventDefault();
-    console.log("flag at:", tileElem.id);
+
+    let split = tileElem.id.split(",");
+    let row = parseInt(split[0]);
+    let col = parseInt(split[1]);
+
+    console.log("flag at:", row, col);
+
+    if(flagAt())
 }
 
 function getTileElem(row, col) {
