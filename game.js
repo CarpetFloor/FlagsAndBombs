@@ -8,6 +8,8 @@ document.body.addEventListener("contextmenu", function(e){e.preventDefault();});
 
 const bg = "#203555";
 let tableElem = document.querySelector("table");
+let div = document.querySelector("div");
+let gameOverContainer = document.querySelector("section");
 
 const cols = 10;
 const rows = cols;
@@ -151,6 +153,9 @@ function clickTile(tileElem) {
         
         fillBombs();
 
+        div.style.width = tableElem.getBoundingClientRect().width + "px";
+        div.style.height = tableElem.getBoundingClientRect().height + "px";
+
         // console.log("GAME");
         // console.log(game);
         // console.log("_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_");
@@ -183,6 +188,8 @@ function clickTile(tileElem) {
             
             tileElem.appendChild(imgElem);
             imgElem.setAttribute("draggable", false);
+
+            gameOver();
         }
         else {
             // calling this function also reveals all other non-number tiles
@@ -319,4 +326,13 @@ function flagTile(e, tileElem) {
 
 function getTileElem(row, col) {
     return tableElem.children[row].children[col];
+}
+
+function gameOver() {
+    div.style.display = "flex";
+    gameOverContainer.style.display = "flex";
+}
+
+function restart() {
+    bombCount = 0;
 }
