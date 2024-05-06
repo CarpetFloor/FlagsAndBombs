@@ -1,3 +1,5 @@
+let debug = false;
+
 const bg = "#203555";
 let tableElem = document.querySelector("table");
 
@@ -37,66 +39,146 @@ for(let row = 0; row < rows; row++) {
     tableElem.appendChild(rowElem);
 }
 
-// fill bombs
-let i = 0;
-let iteration = 0;
-while(bombCount < totalBombs) {
-    console.log("ITERATION", iteration);
+function fillBombs() {
+    let i = 0;
+    let iteration = 0;
+    
+    // fill bombs
+    while(bombCount < totalBombs) {
+        // console.log("ITERATION", iteration);
 
-    for(let row = 0; row < rows; row++) {
-        let rowData = [];
-        
-        for(let col = 0; col < cols; col++) {
-            ++i;
-            let tileElem = getTileElem(row, col);
+        for(let row = 0; row < rows; row++) {
+            let rowData = [];
+            
+            for(let col = 0; col < cols; col++) {
+                ++i;
+                let tileElem = getTileElem(row, col);
 
-            if(bombCount < totalBombs) {
-                let placeBombCheck = random(1, bombChance);
-                
-                if(placeBombCheck == 1) {
-                    if(iteration == 0) {
-                        rowData.push(0);
-                    }
-                    else if(game[row][col] != 0) {
-                        ++bombCount;
-                        game[row][col] = 0;
-                        console.log(i + ": placed bomb " + bombCount + " at " + tileElem.id);
-                        
-                        // html
-                        let imgElem = document.createElement("img");
-                        imgElem.src = "Assets/bomb_1.png";
+                if((bombCount < totalBombs) && ((row != startRow) && (col != startCol))) {
+                    let placeBombCheck = random(1, bombChance);
+                    
+                    if(placeBombCheck == 1) {
+                        if(iteration == 0) {
+                            ++bombCount;
+                            rowData.push(0);
+                            
+                            let imgElem = document.createElement("img");
+                            imgElem.src = "Assets/bomb_1.png";
+                            
+                            tileElem.appendChild(imgElem);
+                            // console.log(i + ": placed bomb " + bombCount + " at " + tileElem.id);
+                        }
+                        else if(game[row][col] != 0) {
+                            ++bombCount;
+                            game[row][col] = 0;
+                            
+                            let imgElem = document.createElement("img");
+                            imgElem.src = "Assets/bomb_1.png";
+                            
+                            tileElem.appendChild(imgElem);
+                            // console.log(i + ": placed bomb " + bombCount + " at " + tileElem.id);
+                        }
+                        /*
+                        else {
+                            console.log(i + ": attempt fail");    
+                        }
+                        */
         
-                        tileElem.appendChild(imgElem);
                     }
                     else {
-                        console.log(i + ": attempt fail");    
+                        rowData.push(-1);
+                        // console.log(i + ": attempt fail");
                     }
-    
                 }
                 else {
-                    rowData.push([-1]);
-                    console.log(i + ": attempt fail");
+                    rowData.push(-1);
+                    // console.log(i + ": no attempt");
                 }
-            }
-            else {
-                rowData.push([-1]);
-                console.log(i + ": no attempt");
+
             }
 
+            if(iteration == 0) {
+                game.push(rowData);
+            }
         }
 
-        if(iteration == 0) {
-            game.push(rowData);
+        ++iteration;
+    }
+
+    // generate numbers
+    for(let row = 0; row < rows; row++) {
+        for(let col = 0; col < cols; col++) {
+            if(game[row][col] != 0) {
+                getTileElem(row, col).innerText = getAdjacentBombs(row, col);
+            }
+        }
+    }
+}
+
+function getAdjacentBombs(row, col) {
+    let count = 0;
+
+    let rowChecks = [0];
+    if(row != 0) {
+        rowChecks.push(-1);
+    }
+    if(row != rows - 1) {
+        rowChecks.push(1);
+    }
+
+    let colChecks = [0];
+    if(col != 0) {
+        colChecks.push(-1);
+    }
+    if(col != col - 1) {
+        colChecks.push(1);
+    }
+
+    for(let r = 0; r < rowChecks.length; r++) {
+        for(let c = 0; c < colChecks.length; c++) {
+            if(!(rowChecks[r] == 0 && colChecks[c] == 0)) {
+                if(debug) {
+                    console.log(
+                        "CHECKING " + 
+                        (row + rowChecks[r]) + "," + (col + colChecks[c]) + 
+                        "(" + rowChecks[r] + "," + colChecks[c] + ") : " + 
+                        game[row + rowChecks[r]][col + colChecks[c]] + " " + 
+                        (game[row + rowChecks[r]][col + colChecks[c]] == 0)
+                    );
+                }
+                if(game[row + rowChecks[r]][col + colChecks[c]] == 0) {
+                    ++count;
+                }
+            }
         }
     }
 
-    ++iteration;
+    return (count == 0) ? -1 : count;
 }
 
 console.log(game);
 
+if(debug) {
+    for(let r = 0; r < rows; r++) {
+        for(let c = 0; c < cols; c++) {
+            getTileElem(r, c).innerHTML += "<span style='font-size: 11px; color: grey;'>(" + r + ", " + c + ")</span>";
+        }
+    }
+}
+
+let startRow = -1;
+let startCol = -1;
 function clickTile(tileElem) {
     console.log("click at:", tileElem.id);
+
+    // ensure firest tile clicked is not a bomb
+    if(bombCount == 0) {
+        let split = tileElem.id.split(",");
+        startRow = parseInt(split[0]);
+        startCol = parseInt(split[1]);
+        
+        fillBombs();
+    }
 }
 
 function flagTile(e, tileElem) {
