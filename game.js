@@ -228,7 +228,14 @@ function revealAdjacents(row, col) {
         if(
         !(revealedHas(rcheck, ccheck)) && 
         (getAdjacentBombs(rcheck, ccheck) == -1)) {
-            getTileElem(rcheck, ccheck).style.backgroundColor = bg;
+            let tileElem = getTileElem(rcheck, ccheck);
+            tileElem.style.backgroundColor = bg;
+
+            // remove flag if there is one
+            if(flagAt(rcheck, ccheck)) {
+                tileElem.innerHTML = "";
+            }
+
             revealed.push([rcheck, ccheck]);
     
             revealAdjacents(rcheck, ccheck);

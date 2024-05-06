@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap");
+
 * {
     user-select: none;
 }
@@ -17,7 +19,9 @@ table tr td {
     /* border-radius: 7px; */
     background-color: #284877;
     text-align: center;
-    color: white;
+    color: lightgrey;
+    font-family: "Roboto Condensed", sans-serif;
+    font-size: 20px;
 }
 table tr td:hover {
     cursor: pointer;
@@ -26,4 +30,6 @@ table tr td:hover {
 table tr td img {
     width: 75%;
     height: 75%;
+    opacity: 0.55;
+    filter: invert(1);
 }
