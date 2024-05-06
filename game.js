@@ -78,7 +78,7 @@ function unHoverTile(tileElem) {
     console.log(row, col, revealedHas(row, col));
 
     if(!(revealedHas(row, col))) {
-        tileElem.style.cursor = "normal";
+        tileElem.style.cursor = "auto";
         tileElem.style.backgroundColor = tileColor;
     }
 }
