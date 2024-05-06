@@ -194,9 +194,6 @@ function clickTile(tileElem) {
         startCol = col;
         
         fillBombs();
-
-        div.style.width = tableElem.getBoundingClientRect().width + "px";
-        div.style.height = tableElem.getBoundingClientRect().height + "px";
     }
 
     // reveal tile
