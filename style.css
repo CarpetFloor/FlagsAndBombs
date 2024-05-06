@@ -1,0 +1,25 @@
+body {
+    background-color: #203555;
+}
+
+table {
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 7em;
+}
+table tr td {
+    /* border-radius: 7px; */
+    background-color: #284877;
+    text-align: center;
+    color: white;
+}
+table tr td:hover {
+    cursor: pointer;
+    background-color: #31568d;
+}
+table tr td img {
+    width: 75%;
+    height: 75%;
+}
