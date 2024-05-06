@@ -16,7 +16,7 @@ let gameOverContainer = document.querySelector("section");
 const cols = 10;
 const rows = cols;
 const tileSize = 50;
-const totalBombs = Math.floor(cols * 1.5);
+const totalBombs = Math.round(cols * 1.75);
 const bombChance = Math.round(((cols * rows) / totalBombs) * 2);
 let bombCount = 0;
 
@@ -61,8 +61,6 @@ function hoverTile(tileElem) {
     let row = parseInt(split[0]);
     let col = parseInt(split[1]);
 
-    // console.log(row, col, revealedHas(row, col));
-
     let valid = (tileElem.innerHTML.length == 0);
 
     if(valid && !(revealedHas(row, col))) {
@@ -79,8 +77,6 @@ function unHoverTile(tileElem) {
     let row = parseInt(split[0]);
     let col = parseInt(split[1]);
 
-    // console.log(row, col, revealedHas(row, col));
-
     if(!(revealedHas(row, col))) {
         tileElem.style.cursor = "auto";
         tileElem.style.backgroundColor = tileColor;
@@ -92,8 +88,6 @@ function fillBombs() {
     let iteration = 0;
     
     while(bombCount < totalBombs) {
-        // console.log("ITERATION", iteration);
-
         for(let row = 0; row < rows; row++) {
             let rowData = [];
             
@@ -108,28 +102,18 @@ function fillBombs() {
                         if(iteration == 0) {
                             ++bombCount;
                             rowData.push(0);
-                            // console.log(i + ": placed bomb " + bombCount + " at " + tileElem.id);
                         }
                         else if(game[row][col] != 0) {
                             ++bombCount;
                             game[row][col] = 0;
-                            // console.log(i + ": placed bomb " + bombCount + " at " + tileElem.id);
                         }
-                        /*
-                        else {
-                            console.log(i + ": attempt fail");    
-                        }
-                        */
-        
                     }
                     else {
                         rowData.push(-1);
-                        // console.log(i + ": attempt fail");
                     }
                 }
                 else {
                     rowData.push(-1);
-                    // console.log(i + ": no attempt");
                 }
 
             }
@@ -183,8 +167,6 @@ function clickTile(tileElem) {
     let split = tileElem.id.split(",");
     let row = parseInt(split[0]);
     let col = parseInt(split[1]);
-    
-    console.log("click at:", row, col);
 
     // ensure firest tile clicked is not a bomb
     if(bombCount == 0) {
@@ -195,26 +177,6 @@ function clickTile(tileElem) {
 
         div.style.width = tableElem.getBoundingClientRect().width + "px";
         div.style.height = tableElem.getBoundingClientRect().height + "px";
-
-        // console.log("GAME");
-        // console.log(game);
-        // console.log("_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_");
- 
-        debug = false;
-        if(debug) {
-            for(let r = 0; r < rows; r++) {
-                for(let c = 0; c < cols; c++) {
-                    let color = "grey";
-                    if(game[r][c] == 0) {
-                        color = "red";
-                    }
-                    getTileElem(r, c).innerHTML += 
-                    "<span style='font-size: 11px; color: " + color + ";'>" + 
-                    getAdjacentBombs(r, c) + 
-                    " (" + r + ", " + c + ")</span>";
-                }
-            }
-        }
     }
 
     // reveal tile
@@ -279,15 +241,10 @@ function revealAdjacents(row, col) {
     if(col < cols - 1) {
         tocheck.push("right");
     }
-    
-    // console.log("--", row, col, "--");
-    // console.log(tocheck);
 
     for(let c of tocheck) {
         let rcheck = row + offsets.get(c)[0];
         let ccheck = col + offsets.get(c)[1];
-
-        // console.log(rcheck, ccheck);
     
         if(
         !(revealedHas(rcheck, ccheck)) && 
@@ -349,7 +306,6 @@ function flagTile(e, tileElem) {
     let row = parseInt(split[0]);
     let col = parseInt(split[1]);
 
-    // console.log("flag at:", row, col);
     
     // only allow placing a flag on a non-number tile and a non-revealed tile
     let valid = (tileElem.innerHTML.length == 0) || ((tileElem.innerHTML.length != 0) && flagAt(row, col));
