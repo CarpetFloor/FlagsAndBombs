@@ -7,6 +7,8 @@ let debug = false;
 document.body.addEventListener("contextmenu", function(e){e.preventDefault();});
 
 const bg = "#203555";
+const tileColor = "#284877";
+const highlightColor = "#31568d";
 let tableElem = document.querySelector("table");
 let div = document.querySelector("div");
 let gameOverContainer = document.querySelector("section");
@@ -41,10 +43,44 @@ for(let row = 0; row < rows; row++) {
         tileElem.addEventListener("click", function(){clickTile(tileElem);});
         tileElem.addEventListener("contextmenu", function(e){flagTile(e, tileElem);});
 
+        tileElem.addEventListener("mouseenter", function(){
+            hoverTile(tileElem);
+        });
+        tileElem.addEventListener("mouseleave", function(){
+            unHoverTile(tileElem);
+        });
+
         rowElem.appendChild(tileElem);
     }
 
     tableElem.appendChild(rowElem);
+}
+
+function hoverTile(tileElem) {
+    let split = tileElem.id.split(",");
+    let row = parseInt(split[0]);
+    let col = parseInt(split[1]);
+
+    console.log(row, col, revealedHas(row, col));
+
+    if(!(revealedHas(row, col))) {
+        tileElem.style.cursor = "pointer";
+        tileElem.style.backgroundColor = highlightColor;
+    }
+
+}
+
+function unHoverTile(tileElem) {
+    let split = tileElem.id.split(",");
+    let row = parseInt(split[0]);
+    let col = parseInt(split[1]);
+
+    console.log(row, col, revealedHas(row, col));
+
+    if(!(revealedHas(row, col))) {
+        tileElem.style.cursor = "normal";
+        tileElem.style.backgroundColor = tileColor;
+    }
 }
 
 function fillBombs() {

@@ -25,10 +25,6 @@ table tr td {
     font-size: 20px;
     z-index: 1;
 }
-table tr td:hover {
-    cursor: pointer;
-    background-color: #31568d;
-}
 table tr td img {
     width: 75%;
     height: 75%;
