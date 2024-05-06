@@ -61,11 +61,14 @@ function hoverTile(tileElem) {
     let row = parseInt(split[0]);
     let col = parseInt(split[1]);
 
-    console.log(row, col, revealedHas(row, col));
+    // console.log(row, col, revealedHas(row, col));
 
     if(!(revealedHas(row, col))) {
         tileElem.style.cursor = "pointer";
         tileElem.style.backgroundColor = highlightColor;
+    }
+    else {
+        tileElem.style.cursor = "auto";
     }
 
 }
@@ -75,7 +78,7 @@ function unHoverTile(tileElem) {
     let row = parseInt(split[0]);
     let col = parseInt(split[1]);
 
-    console.log(row, col, revealedHas(row, col));
+    // console.log(row, col, revealedHas(row, col));
 
     if(!(revealedHas(row, col))) {
         tileElem.style.cursor = "auto";
@@ -180,7 +183,7 @@ function clickTile(tileElem) {
     let row = parseInt(split[0]);
     let col = parseInt(split[1]);
     
-    // console.log("click at:", row, col);
+    console.log("click at:", row, col);
 
     // ensure firest tile clicked is not a bomb
     if(bombCount == 0) {
@@ -232,8 +235,10 @@ function clickTile(tileElem) {
             let count = getAdjacentBombs(row, col);
             if(count == -1) {
                 tileElem.style.backgroundColor = bg;
+                tileElem.style.cursor = "auto";
 
                 // recursively reveal adjacent non-number tiles
+                revealed.push([row, col]);
                 revealAdjacents(row, col);
             }
             else {
