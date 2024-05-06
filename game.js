@@ -54,15 +54,21 @@ for(let row = 0; row < rows; row++) {
         tileElem.style.height = tileSize + "px";
         tileElem.style.border = "2px solid " + bg;
 
-        tileElem.addEventListener("click", function(){clickTile(tileElem);});
-        tileElem.addEventListener("contextmenu", function(e){flagTile(e, tileElem);});
+        if(!(mobile)) {
+            tileElem.addEventListener("click", function(){clickTile(tileElem);});
+            tileElem.addEventListener("contextmenu", function(e){flagTile(e, tileElem);});
 
-        tileElem.addEventListener("mouseenter", function(){
-            hoverTile(tileElem);
-        });
-        tileElem.addEventListener("mouseleave", function(){
-            unHoverTile(tileElem);
-        });
+            tileElem.addEventListener("mouseenter", function(){
+                hoverTile(tileElem);
+            });
+            tileElem.addEventListener("mouseleave", function(){
+                unHoverTile(tileElem);
+            });
+        }
+        else {
+            tileElem.addEventListener("touchstart", function(){press(tileElem);});
+            tileElem.addEventListener("touchend", function(){release(tileElem);});
+        }
 
         rowElem.appendChild(tileElem);
     }
@@ -314,7 +320,9 @@ function flagAt(row, col) {
 
 // right click
 function flagTile(e, tileElem) {
-    e.preventDefault();
+    if(e != null) {
+        e.preventDefault();
+    }
 
     let split = tileElem.id.split(",");
     let row = parseInt(split[0]);
@@ -345,6 +353,38 @@ function flagTile(e, tileElem) {
             // remove hover effect when placing flag
             tileElem.style.backgroundColor = tileColor;
             tileElem.style.cursor = "auto";
+        }
+    }
+}
+
+// mobile controls
+let pressStart;
+let waitingForRelease = false;
+const holdTime = 250;
+
+function press(tileElem) {
+    waitingForRelease = true;
+    pressStart = new Date();
+
+    window.setTimeout(function() {
+        if(waitingForRelease) {
+            waitingForRelease = false;
+            flagTile(null, tileElem);
+        }
+    }, holdTime);
+}
+
+function release(tileElem) {
+    if(waitingForRelease) {
+        waitingForRelease = false;
+        let pressEnd = new Date();
+        let diff = pressEnd - pressStart;
+        
+        if(diff < holdTime) {
+            clickTile(tileElem);
+        }
+        else {
+            flagTile(null, tileElem);
         }
     }
 }
