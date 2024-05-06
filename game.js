@@ -334,5 +334,22 @@ function gameOver() {
 }
 
 function restart() {
+    revealed = [];
+    flags = [];
     bombCount = 0;
+
+    for(let r = 0; r < rows; r++) {
+        for(let c = 0; c < cols; c++) {
+            game[r][c] = -1;
+
+            let tileElem = getTileElem(r, c);
+            tileElem.innerHTML = "";
+            tileElem.style.backgroundColor = "#284877";
+        }
+    }
+
+    fillBombs();
+    
+    gameOverContainer.style.display = "none";
+    div.style.display = "none";
 }
