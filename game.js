@@ -1,5 +1,11 @@
 let debug = false;
 
+/**
+ * prevent right click menu from showing up when clicking anything other than tiles, 
+ * this way in case space in between tiles is right-clicked the menu won't show up
+ */
+document.body.addEventListener("contextmenu", function(e){e.preventDefault();});
+
 const bg = "#203555";
 let tableElem = document.querySelector("table");
 
@@ -129,6 +135,8 @@ function getAdjacentBombs(row, col) {
 
 let startRow = -1;
 let startCol = -1;
+
+// left click
 function clickTile(tileElem) {
     let split = tileElem.id.split(",");
     let row = parseInt(split[0]);
@@ -277,6 +285,7 @@ function flagAt(row, col) {
     return false;
 }
 
+// right click
 function flagTile(e, tileElem) {
     e.preventDefault();
 
@@ -284,7 +293,7 @@ function flagTile(e, tileElem) {
     let row = parseInt(split[0]);
     let col = parseInt(split[1]);
 
-    console.log("flag at:", row, col);
+    // console.log("flag at:", row, col);
     
     // only allow placing a flag on a non-number tile and a non-revealed tile
     let valid = (tileElem.innerHTML.length == 0) || ((tileElem.innerHTML.length != 0) && flagAt(row, col));
