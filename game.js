@@ -15,10 +15,24 @@ let gameOverContainer = document.querySelector("section");
 
 const cols = 10;
 const rows = cols;
-const tileSize = 50;
+let tileSize = 50;
 const totalBombs = Math.round(cols * 1.75);
 const bombChance = Math.round(((cols * rows) / totalBombs) * 2);
 let bombCount = 0;
+
+let mobile = (Math.max(window.innerWidth, window.innerHeight) < 1000);
+if(mobile) {
+    let portrait = (window.innerHeight > window.innerWidth);
+    document.getElementsByClassName("gameOverContainer")[0].style.marginTop = "7.75em";
+    
+    if(portrait) {
+        tileSize = Math.floor(window.innerWidth / (cols * 1.5));
+    }
+    else {
+        tileSize = Math.floor(window.innerHeight / (cols * 1.5));
+        tableElem.style.marginTop = "1em";
+    }
+}
 
 // -1: empty
 // 9: bomb
