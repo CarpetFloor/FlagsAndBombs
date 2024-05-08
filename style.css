@@ -56,10 +56,11 @@ div {
     right: 0;
     margin-left: auto;
     margin-right: auto;
-    margin-top: 14em;
+    margin-top: -7.5em;
     position: absolute;
     z-index: 3;
     display: none;
+    flex-direction: column;
 }
 .gameOverContainer button {
     border: none;
@@ -68,7 +69,7 @@ div {
     font-family: "Open Sans", sans-serif;
     font-size: 30px;
     font-weight: 500;
-    color: #304070;
+    color: x;
     padding: 0.5em;
     padding-top: 0.2em;
     padding-bottom: 0.35em;
@@ -79,4 +80,11 @@ div {
     cursor: pointer;
     filter: brightness(115%);
     box-shadow: 0 0 10px #6b90c7;
+}
+.gameOverContainer #overMessage {
+    font-size: 1.25em;
+    font-family: 'Open Sans';
+    font-weight: bold;
+    color: #7aa0da;
+    margin-bottom: 0.2em;
 }

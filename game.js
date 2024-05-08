@@ -16,14 +16,13 @@ let gameOverContainer = document.querySelector("section");
 const cols = 10;
 const rows = cols;
 let tileSize = 50;
-const totalBombs = Math.round(cols * 1.75);
+const totalBombs = Math.round(cols * 1.35);
 const bombChance = Math.round(((cols * rows) / totalBombs) * 2);
 let bombCount = 0;
 
 let mobile = (Math.max(window.innerWidth, window.innerHeight) < 1000);
 if(mobile) {
     let portrait = (window.innerHeight > window.innerWidth);
-    document.getElementsByClassName("gameOverContainer")[0].style.marginTop = "7.75em";
     
     if(portrait) {
         tileSize = Math.floor(window.innerWidth / (cols * 1.2));
@@ -145,6 +144,24 @@ function fillBombs() {
 
         ++iteration;
     }
+
+    debug = false;
+    if(debug) {
+        for(let r = 0; r < rows; r++) {
+            for(let c = 0; c < cols; c++) {
+                let color = "grey";
+                if(game[r][c] == 0) {
+                    color = "red";
+                }
+                getTileElem(r, c).innerHTML += 
+                "<span style='font-size: 11px; color: " + color + ";'>" + 
+                getAdjacentBombs(r, c) + 
+                " (" + r + ", " + c + ")</span>";
+            }
+        }
+    }
+
+    // console.log(game);
 }
 
 function getAdjacentBombs(row, col) {
@@ -233,14 +250,11 @@ function clickTile(tileElem) {
             }
         }
     }
+
+    gameWinCheck();
 }
 
 let revealed = [];
-const offsets = new Map();
-offsets.set("up", [-1, 0]);
-offsets.set("down", [1, 0]);
-offsets.set("left", [0, -1]);
-offsets.set("right", [0, 1]);
 // recursively reveal adjacent non-number tiles
 function revealAdjacents(row, col) {
     let tocheck = [];
@@ -359,6 +373,8 @@ function flagTile(e, tileElem) {
             tileElem.style.cursor = "auto";
         }
     }
+
+    gameWinCheck();
 }
 
 // mobile controls
@@ -397,12 +413,17 @@ function getTileElem(row, col) {
     return tableElem.children[row].children[col];
 }
 
+let over = false;
 function gameOver() {
+    over = true;
+    document.getElementById("overMessage").innerText = "Game Over";
+
     div.style.display = "flex";
     gameOverContainer.style.display = "flex";
 }
 
 function restart() {
+    over = false;
     revealed = [];
     flags = [];
     bombCount = 0;
@@ -421,4 +442,52 @@ function restart() {
     
     gameOverContainer.style.display = "none";
     div.style.display = "none";
+}
+
+function gameWinCheck() {
+    if(!(over)) {
+        let completedCount = 0;
+        
+        for(let r = 0; r < rows; r++) {
+            for(let c = 0; c < cols; c++) {
+                let tileElem = getTileElem(r, c);
+
+                let emptyCheck = (tileElem.innerHTML.length == 0);
+                let flagCheck = flagAt(r, c);
+                let revealedCheck = revealedHas(r, c);
+                
+                /**
+                 * A completed tile has been flipped over either through 
+                 * clicking and becoming a number, or becoming hidden 
+                 * from being empty.
+                 */
+                if(revealedCheck || (!(emptyCheck) && !(flagCheck))) {
+                    ++completedCount;
+                }
+            }
+        }
+
+        /*
+        console.log(
+            completedCount, 
+            (rows * cols), 
+            bombCount, 
+            ((rows * cols) - bombCount), 
+            (completedCount == ((rows * cols) - bombCount))
+        );
+        */
+
+        /**
+         * Game is won if the number of completed tiles is equal to 
+         * the total of number of tiles minus the number of bombs
+         */
+        let win = (completedCount == ((rows * cols) - bombCount));
+        
+        if(win) {
+            document.getElementById("overMessage").innerText = "You Win!";
+
+            div.style.display = "flex";
+            gameOverContainer.style.display = "flex";
+        }
+    }
 }
