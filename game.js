@@ -26,10 +26,10 @@ if(mobile) {
     document.getElementsByClassName("gameOverContainer")[0].style.marginTop = "7.75em";
     
     if(portrait) {
-        tileSize = Math.floor(window.innerWidth / (cols * 1.5));
+        tileSize = Math.floor(window.innerWidth / (cols * 1.2));
     }
     else {
-        tileSize = Math.floor(window.innerHeight / (cols * 1.5));
+        tileSize = Math.floor(window.innerHeight / (cols * 1.2));
         tableElem.style.marginTop = "1em";
     }
 }
